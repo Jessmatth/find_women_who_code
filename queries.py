@@ -11,12 +11,18 @@ import pickle
 import time
 
 import jwt
-import requests
+import crud
+import model
+
 
 from github import Github
 
+import os 
+
+
+
 # using an access token
-g = Github("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")
+g = Github(os.environ["GITHUB_KEY"])
 
 
 
@@ -38,37 +44,56 @@ def minimum_created_at_date(min_experience, max_experience):
 
         return (f"{max_query_date}..{min_query_date}")
 
-programmer_experience = minimum_created_at_date(1, 14)
+programmer_experience = minimum_created_at_date(1, 2)
 
 
+# def loop_to_collect_programmers(programmer_experience): 
+#     """Github API allows 5,000 responses per hour w/ 30 responses per request or 166 queries. 
+#     This loop is designed to make these queries."""
 
-def loop_to_collect_programmers(programmer_experience): 
-    """Github API allows 5,000 responses per hour w/ 30 responses per request or 166 queries. 
-    This loop is designed to make these queries."""
+#     response_output = []
+payload = {'q': {'location': 'San%20Francisco*','created': programmer_experience}}
+headers = {'Authorization': f'token {os.environ["GITHUB_KEY"]}'}
 
-    response_output = []
-    payload = {'q': {'location': 'San Francisco','created': programmer_experience}}
+#     for i in range(0,10): 
+#         req = requests.get('https://api.github.com/search/users', params=payload, headers=headers) 
+#         read_resp = req.json()
+#         response_output.append(read_resp)
     
-    for i in range(0,10): 
-        req = requests.get('https://api.github.com/search/users', params=payload) 
-        read_resp = req.json()
-        response_output.append(read_resp)
-    
-    return response_output
+#     return response_output
 
-passing_programmer_objects = loop_to_collect_programmers(programmer_experience)
+# passing_programmer_objects = loop_to_collect_programmers(programmer_experience)
+
+api_get_users = 'https://api.github.com/users'
+
+def call_api(apicall, payload, headers):
+
+    data = payload.headers.get('page', [])
+
+    resp = requests.get(apicall)
+    data += resp.json()
+
+    # failsafe
+    if len(data) > 500:
+        return (data)
+
+    if 'next' in resp.links.keys():
+        return (call_api(resp.links['next']['url'], page=data))
+
+    return (data)
+
+
+data = call_api(api_get_users)
+
+
 
 def get_logins_from_API_response(passing_programmer_objects):
     """Loops through the response text to generate a list of logins that match the search criteria."""
 
-    i = 1
-    login_list = []
-
-    while i < len(passing_programmer_objects):
-        import pdb;pdb.set_trace() 
-        l = passing_programmer_objects['items'][i]['login']
-        login_list.append(l)
-        i += 1
+    login_list =[]
+    for item in passing_programmer_objects[0]['items']:
+        login_list.append(item['login'])
+      
     
     return login_list
 
@@ -83,11 +108,11 @@ def using_querie_functions(login_vist_var):
 
     return programmer
 
-programmer_objects = using_querie_functions(login_vist_var)
+list_of_named_users = using_querie_functions(login_vist_var)
+#list_of_named_users is a list of programmer objects
 #req = requests.get('https://api.github.com/search/users', params=payload) 
 
 #response = req.json()
-
 
 def get_first_name(login_vist_var): 
     full_names = []
@@ -124,6 +149,50 @@ name_list = {'name': [first_list_of_ten]}
 r = requests.get('https://api.genderize.io/', params=name_list)
 
 gen_response = r.json()
+
+#model.db.session.add_all(gen_response)  
+#model.db.session.commit() 
+
+
+# inputs: genderizer: Name, gender, programmer objects 
+# output: combination
+def find_women(gen_response):
+    output = []
+    for item in gen_response:
+        for key in item:
+            if key == 'gender' and item[key] == 'male':
+                output.append(item['name'])
+
+    return output
+
+women_names = find_women(gen_response)
+
+def search_response(women_names, list_of_named_users):
+    identified_profiles = []
+
+     
+    for named_user in list_of_named_users: 
+        print(named_user.name)
+        if named_user.name and named_user.name.split(" ", 1)[0] in women_names: 
+            identified_profiles.append(named_user)
+
+
+    return identified_profiles
+
+
+        # for key, value in gen_response.item: 
+        #     if key == 'gender' and value == 'male': 
+        #         print(item['name'])
+    #         if gen_response[key] == 'male': 
+    #             output.append(gen_response['name'])
+    # return output
+# for d in my_list:
+#     for key in d:
+#         print d[key]
+
+    # login_list =[]
+    # for item in passing_programmer_objects[0]['items']:
+    #     login_list.append(item['login'])
 
 # Genderizer rate limit is 1,000 names per day, each query can contain 10 names. 
 # Github rate limit 5,000 requests per hour, default is to return 30.  I believe there is a way to change it to 100. 

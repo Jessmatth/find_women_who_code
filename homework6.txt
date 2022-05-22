@@ -1,0 +1,22 @@
+## Sprint 1: Part 1 -- Project Update
+
+### I have completed my MVP (yes/no):
+ No
+### I have completed these features for my MVP:
+Authentication
+Data model
+seed crud
+queries
+draft server and index
+
+### This coming week, I plan to work on:
+debug search parameters, complete queries, complete form and frontend
+
+### My general work plan/estimate for the rest of Sprint 1:
+Sunday 8hrs: debug search parameters, complete queries 
+During the week, will take as much time as I can off. Ideally, 
+Monday: 4 hours frontend 
+Tuesday: 2 hours
+Wednesday: 4 hours
+
+

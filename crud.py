@@ -43,8 +43,21 @@ def create_programmer(named_user):
                             location=named_user.location,
                             email=named_user.email,
                             twitter_handle=named_user.twitter_username)
+    db.session.add(programmer)
+    db.session.commit()
+
     return programmer
-#working
+
+
+def create_programmers(named_users):
+    """Takes in list of programmer objects and returns list of programmers."""
+    output_list = []
+    
+    for named_user in named_users:
+        coder = create_programmer(named_user)
+        output_list.append(coder)
+
+    return output_list
 
 def return_all_programmers():
     """Return all programmers."""
@@ -61,16 +74,31 @@ def get_programmer_by_login(login):
     return coder
 
 
-def create_gender(first_name, assumed_gender, count, probability):
+def create_gender(first_name, assumed_gender, probability, count):
     """Insert new gender information"""
 
     gender = Gender(first_name=first_name,
                     assumed_gender=assumed_gender,
-                    count=count,
-                    probability=probability)
-
+                    probability=probability,
+                    count=count)
+    
+    db.session.add(gender) 
+    db.session.commit()
+    
     return gender
 #working
+
+def create_genders(gen_response):
+    """Takes in list of gender objects and commits them to db."""
+
+    output_list = []
+    for item in gen_response:
+        first_name, assumed_gender, probability, count = item.values()
+        output = create_gender(first_name, assumed_gender, probability, count)
+        output_list.append(output)
+    
+    return output_list
+
 
 def get_gender(first_name):
     """Return assumed geneder, frequency of name, and probability."""
