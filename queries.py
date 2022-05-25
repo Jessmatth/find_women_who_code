@@ -44,54 +44,63 @@ def minimum_created_at_date(min_experience, max_experience):
 
         return (f"{max_query_date}..{min_query_date}")
 
-programmer_experience = minimum_created_at_date(1, 2)
+programmer_experience = minimum_created_at_date(1, 1)
 
 
-# def loop_to_collect_programmers(programmer_experience): 
-#     """Github API allows 5,000 responses per hour w/ 30 responses per request or 166 queries. 
-#     This loop is designed to make these queries."""
+def loop_to_collect_programmers(programmer_experience): 
+    """Github API allows 5,000 responses per hour w/ 30 responses per request or 166 queries. 
+    This loop is designed to make these queries."""
 
-#     response_output = []
-payload = {'q': {'location': 'San%20Francisco*','created': programmer_experience}}
-headers = {'Authorization': f'token {os.environ["GITHUB_KEY"]}'}
-
-#     for i in range(0,10): 
-#         req = requests.get('https://api.github.com/search/users', params=payload, headers=headers) 
-#         read_resp = req.json()
-#         response_output.append(read_resp)
     
-#     return response_output
+    payload = {'q': {'location': 'San%20Francisco*','created': programmer_experience}}
+    headers = {'Authorization': f'token {os.environ["GITHUB_KEY"]}'}
 
-# passing_programmer_objects = loop_to_collect_programmers(programmer_experience)
+    
+    req = requests.get('https://api.github.com/search/users', params=payload, headers=headers)
+    read_resp = req.json()
+    additional_pages = {}
+    output = {**read_resp,  **additional_pages}
 
-api_get_users = 'https://api.github.com/users'
+    while 'next' in req.links.keys():
+        res = requests.get(req.links['next']['url'],headers=headers)
+        additional_pages.update(res.json())
+    
+    return output
 
-def call_api(apicall, payload, headers):
-
-    data = payload.headers.get('page', [])
-
-    resp = requests.get(apicall)
-    data += resp.json()
-
-    # failsafe
-    if len(data) > 500:
-        return (data)
-
-    if 'next' in resp.links.keys():
-        return (call_api(resp.links['next']['url'], page=data))
-
-    return (data)
+passing_programmer_objects = loop_to_collect_programmers(programmer_experience)
 
 
-data = call_api(api_get_users)
+# url = "https://api.github.com/XXXX?simple=yes&per_page=100&page=1"
+# res=requests.get(url,headers={"Authorization": git_token})
+# repos=res.json()
+# while 'next' in res.links.keys():
+#   res=requests.get(res.links['next']['url'],headers={"Authorization": git_token})
+#   repos.extend(res.json())
 
+# some_repos = user.get_repos().get_page(0)
+# some_other_repos = user.get_repos().get_page(3)
+
+# def collect_programmers(payload, headers):
+#     another_page = True
+#     results = []
+#     api = 'https://api.github.com/search/users'
+#     while another_page: #the list of teams is paginated
+#         r = requests.get(api, params=payload, auth=headers)
+#         json_response = json.loads(r.text)
+#         results.append(json_response)
+#         if 'next' in r.links: #check if there is another page of organisations
+#             api = r.links['next']['url']
+#         else:
+#             another_page=False
+
+#     return results
 
 
 def get_logins_from_API_response(passing_programmer_objects):
     """Loops through the response text to generate a list of logins that match the search criteria."""
 
     login_list =[]
-    for item in passing_programmer_objects[0]['items']:
+    for item in passing_programmer_objects['items']:
         login_list.append(item['login'])
       
     
@@ -109,6 +118,8 @@ def using_querie_functions(login_vist_var):
     return programmer
 
 list_of_named_users = using_querie_functions(login_vist_var)
+
+
 #list_of_named_users is a list of programmer objects
 #req = requests.get('https://api.github.com/search/users', params=payload) 
 
@@ -132,7 +143,33 @@ def get_first_name(login_vist_var):
 
 list_of_first_names = get_first_name(login_vist_var)
 
-first_list_of_ten = list_of_first_names[0:10]
+#first_list_of_ten = list_of_first_names[0:10]
+
+# Define a function that takes in a list of names
+# takes the names in 10 unit increments 
+# and makes a query and saves the results
+# until there are no more names
+
+def get_gender(list_of_first_names): 
+    """Takes in a list of names and makes queries in batches of 10 to generizer."""
+    
+    i = 0
+    list_of_ten = []
+    output_list = []
+
+    for i in list_of_first_names: 
+        if i <= 10:
+            list_of_ten.append(list_of_first_names[i])
+            i += 1
+        elif i > 10:
+            name_list = {'name': [list_of_ten]}
+            r = requests.get('https://api.genderize.io/', params=name_list)
+            gen_response = r.json()
+            output_list.append(gen_response)
+            i = 0
+
+    return output_list
+
     # https://api.genderize.io/?name[]=peter&name[]=lois&name[]=stevie
 
 #gen_payload = {'name': 'peter', 'gender': 'male, 'probability': '.99', 'count': '1234'}
@@ -145,10 +182,10 @@ first_list_of_ten = list_of_first_names[0:10]
 
 #python.sleep(.5)
 
-name_list = {'name': [first_list_of_ten]}
-r = requests.get('https://api.genderize.io/', params=name_list)
+#name_list = {'name': [first_list_of_ten]}
+#r = requests.get('https://api.genderize.io/', params=name_list)
 
-gen_response = r.json()
+#gen_response = r.json()
 
 #model.db.session.add_all(gen_response)  
 #model.db.session.commit() 
