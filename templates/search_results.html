@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Programmer Results{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col d-flex justify-content-center">
+        <a href="/" class="lead backlink">
+          Go back to the search form
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <div id="programmer-search-results">
+          <h2>Programmer Search Results</h2>
+
+          <p>
+            <span id="result-count">
+              {{ print(len(data)) }}
+            </span>
+            developers matched your search.
+          </p>
+
+          <ul class="programmer-list">
+            {% for named_user in data %}
+              <li>
+                  {{ named_user.name }}
+              </li>
+              <li>
+                {{ named_user.company }}
+            </li>
+            <li>
+                {{ named_user.location }}
+            </li>
+            <li>
+                {{ named_user.created_at }}
+            </li>
+            <li>
+                {{ named_user.email }}
+            </li>
+            <li>
+                {{ named_user.twitter_username }}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
