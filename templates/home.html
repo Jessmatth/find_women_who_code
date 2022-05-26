@@ -1,25 +1,36 @@
+
 {% extends 'base.html' %}
 
 {% block title %}find_women_who_code(){% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <h2>Search for Programmers</h2>
 
-      <form action="/search" method="GET"></form>
+
+      <!-- <div class="video-wrapper">
+        <video playsinline autoplay muted loop poster="coding_image.jpg">
+          <source src="https://res.cloudinary.com/drbl3in3w/video/upload/v1653538634/pexels-karolina-grabowska-6346223_hsfsgj.mp4" type="video/webm">
+        </video>
+      </div>
+       -->
+      
+
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <h2>Search for Programmers</h2>
+
+            
+<form action="/search/userinput" method="POST">
       <!-- <form method="GET" action="/search"> -->
           <div class="form-input">
             <form>
             <label for="location">Enter a location: </label>
             <input type="text" location="location" id="location" required>
-          </form>
+          
           </div>
   <br />
-  <div class="form-input">
-    <form action="/search" method="GET"></form>
-    <form> 
+  
+    
     <label for="min_experience">Minimum Years of experience:</label>
     <select id="min_experience" name="min_experience">
       <option value="1">One</option>
@@ -37,9 +48,7 @@
       <option value="13">Thirteen</option>
       <option value="14">Fourteen</option>
     </select>
-  </form>
-   <form action="/search" method="GET"></form>
-    <form>
+  
      <label for="max_experience">Maximum Years of experience:</label>
      <select id="max_experience" name="max_experience">
       <option value="1">One</option>
@@ -57,8 +66,8 @@
       <option value="13">Thirteen</option>
       <option value="14">Fourteen</option>
     </select>
-    </label>
-    <form id="pass-form" onsubmit="window.location.href = '/search';" type="submit" value="Submit" >
+    </label> -->
+    <!-- <form id="pass-form" onsubmit="window.location.href = "/search/userinput", type="submit" value="Submit" > -->
   <input type="submit" value="Submit" />
 </form>
 {% endblock %}

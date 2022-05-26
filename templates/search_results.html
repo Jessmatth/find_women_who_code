@@ -18,33 +18,27 @@
         <div id="programmer-search-results">
           <h2>Programmer Search Results</h2>
 
-          <p>
-            <span id="result-count">
-              {{ print(len(data)) }}
-            </span>
-            developers matched your search.
-          </p>
-
           <ul class="programmer-list">
             {% for named_user in data %}
               <li>
-                  {{ named_user.name }}
+                 Name: {{ named_user.name }}
               </li>
               <li>
-                {{ named_user.company }}
+                Company: {{ named_user.company }}
             </li>
             <li>
-                {{ named_user.location }}
+               Location: {{ named_user.location }}
             </li>
             <li>
-                {{ named_user.created_at }}
+                Date of profile creation: {{ named_user.created_at }}
             </li>
             <li>
-                {{ named_user.email }}
+                Email: {{ named_user.email }}
             </li>
             <li>
-                {{ named_user.twitter_username }}
+                Twitter handle: {{ named_user.twitter_username }}
             </li>
+            </br>
             {% endfor %}
           </ul>
         </div>

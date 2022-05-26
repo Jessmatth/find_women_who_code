@@ -1,6 +1,6 @@
 import os
 from flask import (Flask, render_template, request, flash, session,
-                   redirect)
+                   redirect, url_for)
 from model import connect_to_db, db
 import crud
 import queries
@@ -24,15 +24,16 @@ def home():
 
     return render_template('home.html')
 
+@app.route('/search/userinput', methods=['POST'])
+def get_user_inputs():
+    """Collect search criteria and show results. """
 
-
-@app.route('/search')
-def show_results():
-    """Display search results"""
-
-    location = request.args.get('location', '')
-    min_years_of_experience = request.args.get('min_years_of_experience', '')
-    max_years_of_experience = request.args.get('max_years_of_experience', '')
+    location = request.form.get('location', '')
+    min_years_of_experience = request.form.get('min_years_of_experience', '')
+    max_years_of_experience = request.form.get('max_years_of_experience', '')
+    print("*******************************************************" +location)
+    print(min_years_of_experience)
+    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" +max_years_of_experience)
 
     programmer_experience = queries.minimum_created_at_date(min_years_of_experience, max_years_of_experience)
     passing_programmer_objects = queries.loop_to_collect_programmers(programmer_experience, location)
@@ -45,6 +46,7 @@ def show_results():
 
 
     return render_template('search_results.html', data=output_programmers)
+
 
 
 
