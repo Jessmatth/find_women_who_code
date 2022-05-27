@@ -1,5 +1,7 @@
 """Python Github queries for programmer data."""
 from imaplib import _Authenticator
+from operator import mod
+from re import L
 from socket import TCP_NODELAY
 from urllib import response
 
@@ -10,16 +12,16 @@ import datetime
 import pickle
 import time
 
-import jwt
 import crud
 import model
+import server
 
 
 from github import Github
 
 import os 
 
-
+import pdb
 
 # using an access token
 g = Github(os.environ["GITHUB_KEY"])
@@ -44,41 +46,29 @@ def minimum_created_at_date(min_experience, max_experience):
 
         return (f"{max_query_date}..{min_query_date}")
 
-programmer_experience = minimum_created_at_date(1, 1)
+programmer_experience = minimum_created_at_date(0, 1)
+location = "San Francisco"
 
 
-def loop_to_collect_programmers(programmer_experience): 
+def loop_to_collect_programmers(programmer_experience, location): 
     """Github API allows 5,000 responses per hour w/ 30 responses per request or 166 queries. 
     This loop is designed to make these queries."""
 
-    
-    payload = {'q': {'location': 'San%20Francisco*','created': programmer_experience}}
+    page = 1
     headers = {'Authorization': f'token {os.environ["GITHUB_KEY"]}'}
-
+   
+    while page < 5:
+    #req = requests.get('https://api.github.com/search/users', params=payload, headers=headers) since=100000000&per_page=100
+        req = requests.get(f'https://api.github.com/search/users?q=location:{location}&created:{programmer_experience}page={page}&per_page=100', headers=headers)
+        read_resp = req.json()
+        page += 1
     
-    req = requests.get('https://api.github.com/search/users', params=payload, headers=headers)
-    read_resp = req.json()
-    additional_pages = {}
-    output = {**read_resp,  **additional_pages}
+    crud.create_programmers(read_resp)
 
-    while 'next' in req.links.keys():
-        res = requests.get(req.links['next']['url'],headers=headers)
-        additional_pages.update(res.json())
-    
-    return output
-
-passing_programmer_objects = loop_to_collect_programmers(programmer_experience)
+    return read_resp
 
 
-# url = "https://api.github.com/XXXX?simple=yes&per_page=100&page=1"
-# res=requests.get(url,headers={"Authorization": git_token})
-# repos=res.json()
-# while 'next' in res.links.keys():
-#   res=requests.get(res.links['next']['url'],headers={"Authorization": git_token})
-#   repos.extend(res.json())
-
-# some_repos = user.get_repos().get_page(0)
-# some_other_repos = user.get_repos().get_page(3)
+passing_programmer_objects = loop_to_collect_programmers(programmer_experience, location)
 
 # def collect_programmers(payload, headers):
 #     another_page = True
@@ -118,7 +108,8 @@ def using_querie_functions(login_vist_var):
     return programmer
 
 list_of_named_users = using_querie_functions(login_vist_var)
-
+#db.session.add(list_of_named_users)     # 
+#db.session.commit() 
 
 #list_of_named_users is a list of programmer objects
 #req = requests.get('https://api.github.com/search/users', params=payload) 
@@ -143,31 +134,29 @@ def get_first_name(login_vist_var):
 
 list_of_first_names = get_first_name(login_vist_var)
 
-#first_list_of_ten = list_of_first_names[0:10]
-
-# Define a function that takes in a list of names
-# takes the names in 10 unit increments 
-# and makes a query and saves the results
-# until there are no more names
 
 def get_gender(list_of_first_names): 
     """Takes in a list of names and makes queries in batches of 10 to generizer."""
     
+    #headers = {'Authorization': f'token {os.environ["GENDERIZER_KEY"]}'}
+    authorization = f'&apikey={os.environ["GENDERIZER_KEY"]}'
+
     i = 0
     list_of_ten = []
     output_list = []
+   
+    for i in range(len(list_of_first_names)): 
+        list_of_ten.append(list_of_first_names[i])
 
-    for i in list_of_first_names: 
-        if i <= 10:
-            list_of_ten.append(list_of_first_names[i])
-            i += 1
-        elif i > 10:
-            name_list = {'name': [list_of_ten]}
-            r = requests.get('https://api.genderize.io/', params=name_list)
+        if len(list_of_ten) == 10:
+            params = {'name': list_of_ten, 'apikey': os.environ["GENDERIZER_KEY"]}
+            r = requests.get('https://api.genderize.io/', params=params)
             gen_response = r.json()
             output_list.append(gen_response)
-            i = 0
-
+            list_of_ten = []
+    
+    crud.create_genders(output_list)
+    
     return output_list
 
     # https://api.genderize.io/?name[]=peter&name[]=lois&name[]=stevie
@@ -175,29 +164,22 @@ def get_gender(list_of_first_names):
 #gen_payload = {'name': 'peter', 'gender': 'male, 'probability': '.99', 'count': '1234'}
 
 
-#gen_req = requests.get('https://api.genderize.io/?', params=gen_payload)
-
-#payload = {'name': 'peter'}
-#r = requests.get('https://httpbin.org/get', params=first_list_of_ten)
-
-#python.sleep(.5)
-
-#name_list = {'name': [first_list_of_ten]}
-#r = requests.get('https://api.genderize.io/', params=name_list)
-
-#gen_response = r.json()
 
 #model.db.session.add_all(gen_response)  
 #model.db.session.commit() 
+
+gen_response = get_gender(list_of_first_names)
+#db.session.add(gen_response)     
+#db.session.commit() 
 
 
 # inputs: genderizer: Name, gender, programmer objects 
 # output: combination
 def find_women(gen_response):
     output = []
-    for item in gen_response:
-        for key in item:
-            if key == 'gender' and item[key] == 'male':
+    for batch in gen_response:
+        for item in batch:
+            if item['gender'] == 'female':
                 output.append(item['name'])
 
     return output
@@ -205,18 +187,44 @@ def find_women(gen_response):
 women_names = find_women(gen_response)
 
 def search_response(women_names, list_of_named_users):
-    identified_profiles = []
-
-     
+    #initialize a new list and append with users.
+    output= []
     for named_user in list_of_named_users: 
-        print(named_user.name)
+        #print(named_user.name)
         if named_user.name and named_user.name.split(" ", 1)[0] in women_names: 
-            identified_profiles.append(named_user)
+            output.append(named_user)
+    
+    return output
+
+output_programmers = search_response(women_names, list_of_named_users)  
+
+def optional_print(ouput_programmers): 
+    list_of_output_str = []
+
+    for named_user in output_programmers:
+        profile = (f'name: {named_user.name} email:{named_user.email} company: {named_user.company} login: {named_user.login} location: {named_user.location} twitter: {named_user.twitter_username}')
+        list_of_output_str.append(profile)
+    
+    return list_of_output_str
+
+output = optional_print(output_programmers)
+print(output)
+
+# def return_search_results(list_of_named_users, identified_profiles): 
+#     """Takes in a list of full names and returns programmer information."""
+#     #match = any(profile.name in name for profile.name in list_of_named_users for name in identified_profiles)
+
+#     for i in list_of_named_users: 
+#         name = i.name
+#         for profile in identified_profiles: 
+#             if name == profile: 
+#                 return (f'name: {profile.name} email:{profile.email} company: {profile.company} login: {profile.login} location: {profile.location} twitter: {profile.twitter_username}')
+#             else: 
+#                 return ("No results")
 
 
-    return identified_profiles
-
-
+#search_results = return_search_results(list_of_named_users, output)
+#print(search_results)
         # for key, value in gen_response.item: 
         #     if key == 'gender' and value == 'male': 
         #         print(item['name'])

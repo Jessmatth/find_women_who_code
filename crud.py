@@ -36,7 +36,7 @@ def create_programmer_languages(programmer, languages):
 def create_programmer(named_user):
     """Insert a new programmer in the database"""
 
-    programmer = Programmer(login=named_user.login, 
+    programmer = Programmer(login=named_user.login,
                             full_name=named_user.name,
                             company_name= named_user.company,
                             profile_created_at= named_user.created_at,
@@ -92,12 +92,15 @@ def create_genders(gen_response):
     """Takes in list of gender objects and commits them to db."""
 
     output_list = []
-    for item in gen_response:
-        first_name, assumed_gender, probability, count = item.values()
-        output = create_gender(first_name, assumed_gender, probability, count)
-        output_list.append(output)
+    for lst in gen_response:
+        for dic in lst:
+            output = create_gender(dic['name'], dic['gender'], dic['probability'], dic['count'])
+            output_list.append(output)
     
     return output_list
+
+
+
 
 
 def get_gender(first_name):
