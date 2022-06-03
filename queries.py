@@ -34,7 +34,7 @@ def minimum_created_at_date(min_experience, max_experience):
     now = datetime.datetime.now().isoformat()
     now = now[:10]
     year_digits = now[2:4]
-
+    
     
     if max_experience and min_experience:
         year_digits = int(year_digits)
@@ -46,8 +46,6 @@ def minimum_created_at_date(min_experience, max_experience):
 
         return (f"{max_query_date}..{min_query_date}")
 
-programmer_experience = minimum_created_at_date(0, 1)
-location = "San Francisco"
 
 
 def loop_to_collect_programmers(programmer_experience, location): 
@@ -62,13 +60,11 @@ def loop_to_collect_programmers(programmer_experience, location):
         req = requests.get(f'https://api.github.com/search/users?q=location:{location}&created:{programmer_experience}page={page}&per_page=100', headers=headers)
         read_resp = req.json()
         page += 1
-    
-    crud.create_programmers(read_resp)
 
     return read_resp
 
 
-passing_programmer_objects = loop_to_collect_programmers(programmer_experience, location)
+
 
 # def collect_programmers(payload, headers):
 #     another_page = True
@@ -96,18 +92,40 @@ def get_logins_from_API_response(passing_programmer_objects):
     
     return login_list
 
-login_vist_var = get_logins_from_API_response(passing_programmer_objects)
 
-def using_querie_functions(login_vist_var):
+
+def using_querie_functions(login_vist_var, min_years_of_experience, max_years_of_experience):
     """Take logins and get programmer objects."""
-    programmer = []
+    programmers = []
+    output = []
     for login in login_vist_var:
         user_profile = g.get_user(login)
-        programmer.append(user_profile)
+        programmers.append(user_profile)
 
-    return programmer
+    crud.create_programmers(programmers)
+    
+    now = datetime.datetime.now().isoformat()
+    now = now[:10]
+    year_digits = now[2:4]
+    int(year_digits)
 
-list_of_named_users = using_querie_functions(login_vist_var)
+    for named_user in programmers: 
+        experience = named_user.created_at
+        print("datetime object print statement", experience)
+        experience = strftime(experience)
+        print("strftime printstatement", experience)
+        experience = experience[2:4]
+        print("splice print statement", experience)
+        experience = year_digits - int(experience)
+
+        if min_years_of_experience <= experience <= max_years_of_experience: 
+            print(experience)
+            print(type(experience))
+            output.append(named_user)
+
+    return output
+
+
 #db.session.add(list_of_named_users)     # 
 #db.session.commit() 
 
@@ -132,8 +150,6 @@ def get_first_name(login_vist_var):
     return first_name
 
 
-list_of_first_names = get_first_name(login_vist_var)
-
 
 def get_gender(list_of_first_names): 
     """Takes in a list of names and makes queries in batches of 10 to generizer."""
@@ -156,7 +172,7 @@ def get_gender(list_of_first_names):
             list_of_ten = []
     
     crud.create_genders(output_list)
-    
+
     return output_list
 
     # https://api.genderize.io/?name[]=peter&name[]=lois&name[]=stevie
@@ -168,13 +184,20 @@ def get_gender(list_of_first_names):
 #model.db.session.add_all(gen_response)  
 #model.db.session.commit() 
 
-gen_response = get_gender(list_of_first_names)
+
 #db.session.add(gen_response)     
 #db.session.commit() 
+# def committ_prog_gen_info():
+#     """Calls crud functions to insert data into db."""
+#     with app.app_context():
+#         crud.create_genders(gen_response)
+#         crud.create_programmers(list_of_named_users)
 
+#     return "data inserted in gender and programmer tables"
 
-# inputs: genderizer: Name, gender, programmer objects 
-# output: combination
+# committ_prog_gen_info()
+# # inputs: genderizer: Name, gender, programmer objects 
+# # output: combination
 def find_women(gen_response):
     output = []
     for batch in gen_response:
@@ -184,10 +207,11 @@ def find_women(gen_response):
 
     return output
 
-women_names = find_women(gen_response)
+
 
 def search_response(women_names, list_of_named_users):
-    #initialize a new list and append with users.
+    """initialize a new list and append with users."""
+
     output= []
     for named_user in list_of_named_users: 
         #print(named_user.name)
@@ -196,19 +220,33 @@ def search_response(women_names, list_of_named_users):
     
     return output
 
-output_programmers = search_response(women_names, list_of_named_users)  
+def call_functions(location, min_years_of_experience, max_years_of_experience):
+    """Calls all functions in queries"""
+    programmer_experience = minimum_created_at_date(min_years_of_experience, max_years_of_experience)
+    passing_programmer_objects = loop_to_collect_programmers(programmer_experience, location)
+    login_vist_var = get_logins_from_API_response(passing_programmer_objects)
+    list_of_named_users = using_querie_functions(login_vist_var, min_years_of_experience, max_years_of_experience)
+    list_of_first_names = get_first_name(login_vist_var)
+    gen_response = get_gender(list_of_first_names)
+    women_names = find_women(gen_response)
+    output_programmers = search_response(women_names, list_of_named_users)
+    #output = optional_print(output_programmers)
+    #print(output)
 
-def optional_print(ouput_programmers): 
-    list_of_output_str = []
+    return output_programmers
 
-    for named_user in output_programmers:
-        profile = (f'name: {named_user.name} email:{named_user.email} company: {named_user.company} login: {named_user.login} location: {named_user.location} twitter: {named_user.twitter_username}')
-        list_of_output_str.append(profile)
+# def optional_print(ouput_programmers): 
+#     list_of_output_str = []
+
+#     for named_user in output_programmers:
+#         profile = (f'name: {named_user.name} email:{named_user.email} company: {named_user.company} login: {named_user.login} location: {named_user.location} twitter: {named_user.twitter_username}')
+#         list_of_output_str.append(profile)
     
-    return list_of_output_str
+#     return list_of_output_str
 
-output = optional_print(output_programmers)
-print(output)
+
+
+
 
 # def return_search_results(list_of_named_users, identified_profiles): 
 #     """Takes in a list of full names and returns programmer information."""
@@ -246,3 +284,7 @@ print(output)
 # Match the genderizer responses to github data. 
 # Filter out the presumed women. 
 # create query to get languages
+if __name__ == "__main__":
+    from flask import Flask
+    app = Flask(__name__)
+    model.connect_to_db(app)
