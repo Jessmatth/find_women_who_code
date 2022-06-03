@@ -18,7 +18,8 @@
         <div class="row">
           <div class="col">
             <h2>Search for Programmers</h2>
-
+        </div class="row">
+          </div class="col">
             
 <form action="/search/userinput" method="POST">
       <!-- <form method="GET" action="/search"> -->
@@ -66,8 +67,11 @@
       <option value="13">Thirteen</option>
       <option value="14">Fourteen</option>
     </select>
-    </label> -->
+    <label> --></label>
     <!-- <form id="pass-form" onsubmit="window.location.href = "/search/userinput", type="submit" value="Submit" > -->
   <input type="submit" value="Submit" />
 </form>
+
+<!-- Create loader(make it invisibile until they click submit) or gif in js when submit is clicked, when there is a response -->
+
 {% endblock %}

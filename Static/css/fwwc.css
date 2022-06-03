@@ -1,15 +1,51 @@
+
+  video {
+    /** Simulationg background-size: cover */
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .video-wrapper {
+    border: 2px solid #000;
+    width: 1500px;
+    height: 1000px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
 .header {
-    height: 160px;
+    height: 0px;
     padding-top: 0.8em;
     text-align: center;
     font-size: 3em;
-    background: rgb(192, 235, 255) url(/static/img/coding_image.jpeg) no-repeat right;
-    background-size: 220px 210px;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
     margin-bottom: 0.67em;
   }
+
+.title {
+    font-size: 3em;
+    justify-content: left;
+    align-items: center;
+    color: black
+  }
   
+.base {
+    justify-content: left;
+    align-items: center;
+    color: black
+}
+
+
   img {
     width: 100%;
   }
@@ -30,6 +66,7 @@
   th {
     font-family: 'Helvetica', sans-serif;
     font-weight: normal;
+    color: black
   }
   
   .backlink::before {
@@ -39,10 +76,22 @@
   .row > * {
     padding-left: 0;
     padding-right: 0;
+    align-items: center;
   }
   
   .row > .above {
     margin-bottom: 0;
     margin-top: 10px;
+    align-items: center;
   }
   
+  .container {
+    align-items: center;
+  }
+
+  .form-input {
+    align-items: center;
+  }
+
+
+ 

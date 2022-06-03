@@ -2,7 +2,7 @@
 
 from model import User, RecruiterQuery, RecruiterQueryLanguages, Gender, Languages, ProgrammerLanguages, Programmer, connect_to_db
 
-from model import db 
+from model import db, connect_to_db 
 
 import datetime
 
@@ -43,6 +43,8 @@ def create_programmer(named_user):
                             location=named_user.location,
                             email=named_user.email,
                             twitter_handle=named_user.twitter_username)
+    # add check of login to see if in the db
+
     db.session.add(programmer)
     db.session.commit()
 
@@ -82,7 +84,7 @@ def create_gender(first_name, assumed_gender, probability, count):
                     probability=probability,
                     count=count)
     
-    db.session.add(gender) 
+    db.session.add(gender)
     db.session.commit()
     
     return gender
@@ -131,6 +133,7 @@ def create_recruiter_querie(language_name, location, min_years_of_experience, ma
 
 
 
-if __name__ == '__main__':
-    from server import app
+if __name__ == "__main__":
+    from flask import Flask
+    app = Flask(__name__)
     connect_to_db(app)

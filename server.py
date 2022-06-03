@@ -35,15 +35,10 @@ def get_user_inputs():
     print(min_years_of_experience)
     print("++++++++++++++++++++++++++++++++++++++++++++++++++++" ,max_years_of_experience)
 
-    programmer_experience = queries.minimum_created_at_date(min_years_of_experience, max_years_of_experience)
-    passing_programmer_objects = queries.loop_to_collect_programmers(programmer_experience, location)
-    login_vist_var = queries.get_logins_from_API_response(passing_programmer_objects)
-    list_of_named_users = queries.using_querie_functions(login_vist_var)
-    list_of_first_names = queries.get_first_name(login_vist_var)
-    gen_response = queries.get_gender(list_of_first_names)
-    women_names = queries.find_women(gen_response)
-    output_programmers = queries.search_response(women_names, list_of_named_users)
-    print(programmer_experience)
+    #Check if I have programmers in the database and return them if I do. 
+    #If not, call the queries that call functions
+ 
+    output_programmers = queries.call_functions(location, min_years_of_experience, max_years_of_experience)
 
     return render_template('search_results.html', data=output_programmers)
 

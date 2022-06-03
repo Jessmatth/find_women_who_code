@@ -1,4 +1,3 @@
-import React from "react";
 
 
 function App() {
@@ -25,3 +24,5 @@ function App() {
       </ReactRouterDOM.BrowserRouter>
     );
   }
+
+  ReactDOM.render(App,document.getElementById("root"))

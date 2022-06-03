@@ -48,7 +48,7 @@ def minimum_created_at_date(min_experience, max_experience):
 
 
 
-def loop_to_collect_programmers(programmer_experience, location): 
+def loop_to_collect_programmers(location): 
     """Github API allows 5,000 responses per hour w/ 30 responses per request or 166 queries. 
     This loop is designed to make these queries."""
 
@@ -57,7 +57,7 @@ def loop_to_collect_programmers(programmer_experience, location):
    
     while page < 5:
     #req = requests.get('https://api.github.com/search/users', params=payload, headers=headers) since=100000000&per_page=100
-        req = requests.get(f'https://api.github.com/search/users?q=location:{location}&created:{programmer_experience}page={page}&per_page=100', headers=headers)
+        req = requests.get(f'https://api.github.com/search/users?q=location:{location}&page={page}&per_page=100', headers=headers)
         read_resp = req.json()
         page += 1
 
@@ -107,22 +107,24 @@ def using_querie_functions(login_vist_var, min_years_of_experience, max_years_of
     now = datetime.datetime.now().isoformat()
     now = now[:10]
     year_digits = now[2:4]
-    int(year_digits)
+    num_year_digits = int(year_digits)
+    print("min years of experience", min_years_of_experience)
+    print("max years of experience", max_years_of_experience)
 
     for named_user in programmers: 
         experience = named_user.created_at
-        print("datetime object print statement", experience)
-        experience = strftime(experience)
-        print("strftime printstatement", experience)
+        experience = experience.strftime("%Y")
         experience = experience[2:4]
-        print("splice print statement", experience)
-        experience = year_digits - int(experience)
+        num_experience = int(experience)
+        
+        num_experience = num_year_digits - num_experience
+        print(num_experience)
 
-        if min_years_of_experience <= experience <= max_years_of_experience: 
-            print(experience)
-            print(type(experience))
+        if min_years_of_experience <= num_experience <= max_years_of_experience: 
+            print(num_experience)
+            print(type(num_experience))
             output.append(named_user)
-
+    print("filered by experience:", output)
     return output
 
 
@@ -211,10 +213,12 @@ def find_women(gen_response):
 
 def search_response(women_names, list_of_named_users):
     """initialize a new list and append with users."""
+    print("women's names:", women_names)
+
 
     output= []
     for named_user in list_of_named_users: 
-        #print(named_user.name)
+        print(named_user.name)
         if named_user.name and named_user.name.split(" ", 1)[0] in women_names: 
             output.append(named_user)
     
@@ -222,8 +226,8 @@ def search_response(women_names, list_of_named_users):
 
 def call_functions(location, min_years_of_experience, max_years_of_experience):
     """Calls all functions in queries"""
-    programmer_experience = minimum_created_at_date(min_years_of_experience, max_years_of_experience)
-    passing_programmer_objects = loop_to_collect_programmers(programmer_experience, location)
+    #programmer_experience = minimum_created_at_date(min_years_of_experience, max_years_of_experience)
+    passing_programmer_objects = loop_to_collect_programmers(location)
     login_vist_var = get_logins_from_API_response(passing_programmer_objects)
     list_of_named_users = using_querie_functions(login_vist_var, min_years_of_experience, max_years_of_experience)
     list_of_first_names = get_first_name(login_vist_var)

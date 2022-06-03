@@ -1,2 +1,4 @@
 PyGithub
 secrets.sh
+env
+*.DS_Store

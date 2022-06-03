@@ -66,7 +66,7 @@ class Gender(db.Model):
     first_name = db.Column(db.String)
     assumed_gender = db.Column(db.String)
     count = db.Column(db.Integer)
-    probability = db.Column(db.Integer)
+    probability = db.Column(db.Float)
 
     def __repr__(self):
         return f'<Gender programmer_id={self.programmer_id} first_name={self.first_name} assumed_gender={self.assumed_gender}>'

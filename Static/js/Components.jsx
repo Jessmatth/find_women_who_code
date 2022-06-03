@@ -1,11 +1,10 @@
-import React from "react";
 
 class SearchInputs extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-      location: 'San Francisco'
-      min_experience: '1'
+      location: 'San Francisco',
+      min_experience: '1',
       max_experience: '2'
       };
   
@@ -79,25 +78,33 @@ class SearchInputs extends React.Component {
             </label>
           <input type="submit" value="Submit" />
         </form>
-      );
+      )};
+      }
  
- 
+class SearchOutputs  {
 
+    constructor(programmer) {
+        this.name = programmer.name;
+        this.company = programmer.company;
+        this.location = programmer.location;
+        this.created_at = programmer.created_at;
+        this.email = programmer.email;
+        this.twitter_username = programmer.twitter_username;
 
+    }
 
-function Card({programmer}) {
+    display() {
   return(
+
     <div className="tc bg-light-green dib br3 pa3 ma2 grow bw2 shadow-5">
-      <h1>{named_user.name}</h1>
+      <h1>{this.name}</h1>
       <ul>
-        <li>{named_user.company}</li>
-        <li>{named_user.location}</li>
-        <li>{named_user.created_at}</li>
-        <li>{named_user.email}</li>
-        <li>{named_user.twitter_username}</li>
+        <li>{this.company}</li>
+        <li>{this.location}</li>
+        <li>{this.created_at}</li>
+        <li>{this.email}</li>
+        <li>{this.twitter_username}</li>
      </ul>
     </div>
-  );
-}
-
-
+    )
+}};
