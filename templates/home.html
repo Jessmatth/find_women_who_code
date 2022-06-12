@@ -2,7 +2,9 @@
 {% extends 'base.html' %}
 
 {% block title %}find_women_who_code(){% endblock %}
-
+{% block header %}
+<script src="../static/js/searching_alert.js"> </script>
+{% endblock%}
 {% block content %}
 
 
@@ -20,8 +22,10 @@
             <h2>Search for Programmers</h2>
         </div class="row">
           </div class="col">
-            
-<form action="/search/userinput" method="POST">
+      
+          <a href="/add_your_data">Add your data</a>
+
+<form id="user_input" action="/search/userinput" method="POST">
       <!-- <form method="GET" action="/search"> -->
           <div class="form-input">
             <form>
@@ -34,6 +38,7 @@
     
     <label for="min_experience">Minimum Years of experience:</label>
     <select id="min_experience" name="min_experience">
+      <option value="0">Zero</option>
       <option value="1">One</option>
       <option value="2">Two</option>
       <option value="3">Three</option>
@@ -47,7 +52,6 @@
       <option value="11">Eleven</option>
       <option value="12">Twelve</option>
       <option value="13">Thirteen</option>
-      <option value="14">Fourteen</option>
     </select>
   
      <label for="max_experience">Maximum Years of experience:</label>
@@ -67,9 +71,12 @@
       <option value="13">Thirteen</option>
       <option value="14">Fourteen</option>
     </select>
+    <div id="message" class="message">
+      <p>Searching...</p>
+  </div>
     <label> --></label>
     <!-- <form id="pass-form" onsubmit="window.location.href = "/search/userinput", type="submit" value="Submit" > -->
-  <input type="submit" value="Submit" />
+  <input type="submit" id = "submitt_button" value="Submit" />
 </form>
 
 <!-- Create loader(make it invisibile until they click submit) or gif in js when submit is clicked, when there is a response -->

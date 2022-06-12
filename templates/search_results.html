@@ -19,27 +19,31 @@
           <h2>Programmer Search Results</h2>
 
           <ul class="programmer-list">
+          {% if data %}
             {% for named_user in data %}
               <li>
-                 Name: {{ named_user.name }}
+                 Name: {{ named_user.full_name }}
               </li>
               <li>
-                Company: {{ named_user.company }}
+                Company: {{ named_user.company_name }}
             </li>
             <li>
                Location: {{ named_user.location }}
             </li>
             <li>
-                Date of profile creation: {{ named_user.created_at }}
+                Date of profile creation: {{ named_user.profile_created_at }}
             </li>
             <li>
                 Email: {{ named_user.email }}
             </li>
             <li>
-                Twitter handle: {{ named_user.twitter_username }}
+                Twitter handle: {{ named_user.twitter_handle }}
             </li>
             </br>
             {% endfor %}
+          {% else %}
+            <p> No Results Found</p>
+          {% endif %}
           </ul>
         </div>
       </div>
