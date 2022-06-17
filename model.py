@@ -1,6 +1,7 @@
 """Models for find women who code app."""
 
 from flask_sqlalchemy import SQLAlchemy
+import enum
 
 db = SQLAlchemy()
 
@@ -19,6 +20,20 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User user_id={self.user_id}>'
+
+class Favorite(db.Model):
+    """Favorite programmers."""
+
+    __tablename__ = "favorites"
+
+    fav_id = db.Column(db.Integer,
+                        autoincrement=True,
+                        primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    programmer_id = db.Column(db.Integer, db.ForeignKey("programmers.programmer_id"))
+
+    def __repr__(self):
+        return f'<Favorite={self.fav_id} {self.user_id} {self.programmer_id}>'
 
 class RecruiterQuery(db.Model):
     """Search input from user."""
@@ -61,8 +76,6 @@ class Gender(db.Model):
     gender_id = db.Column(db.Integer,
                         autoincrement= True,
                         primary_key= True)
-    programmer_id = db.Column(db.Integer, 
-                        db.ForeignKey("programmers.programmer_id"))
     first_name = db.Column(db.String)
     assumed_gender = db.Column(db.String)
     count = db.Column(db.Integer)
@@ -70,6 +83,8 @@ class Gender(db.Model):
 
     def __repr__(self):
         return f'<Gender programmer_id={self.programmer_id} first_name={self.first_name} assumed_gender={self.assumed_gender}>'
+
+    #def add_programmer_id_to_gender(): Programmer.query.filter_by(location='Liz')
 
 class Languages(db.Model):
     """Id for each language ."""
@@ -104,6 +119,11 @@ class ProgrammerLanguages(db.Model):
     def __repr__(self):
         return f'<programmer_languages programmer_languages_id={self.programmer_languages_id} programmer_id={self.programmer_id} languages_id={self.languages_id}>'
 
+class GenderEnum(enum.Enum):
+    male = "male"
+    female = "female"
+    non_binary = "non-binary"
+
 class Programmer(db.Model): 
     """Github profile information."""
 
@@ -112,6 +132,7 @@ class Programmer(db.Model):
     programmer_id = db.Column(db.Integer,
                             autoincrement= True,
                             primary_key = True)
+    gender = db.Column(db.Enum(GenderEnum,values_callable=lambda x:[str(g.value)for g in GenderEnum]))
     login = db.Column(db.String)
     full_name = db.Column(db.String)
     company_name = db.Column(db.String)

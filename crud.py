@@ -1,10 +1,11 @@
 """CRUD operations."""
 
-from model import User, RecruiterQuery, RecruiterQueryLanguages, Gender, Languages, ProgrammerLanguages, Programmer, connect_to_db
+from model import GenderEnum, User, RecruiterQuery, RecruiterQueryLanguages, Gender, Languages, ProgrammerLanguages, Programmer, connect_to_db, Favorite
 
 from model import db, connect_to_db 
-
+from sqlalchemy import and_
 import datetime
+from dateutil.relativedelta import relativedelta
 
 # def create_user():
 #     """Establish new recruiter site user."""
@@ -32,6 +33,15 @@ def create_programmer_languages(programmer, languages):
 
     return programmer_languages
    
+def create_prog_frm_user_input(gh_profile, gender):
+    """Insert a new programmer in the database, based on user input."""
+
+    programmer = create_programmer(gh_profile)
+    name = gh_profile.name
+    first_name = name.split(" ", 1)
+    create_gender(first_name, gender, probability=None, count=None)
+ 
+    return first_name, gender, programmer 
 
 def create_programmer(named_user):
     """Insert a new programmer in the database"""
@@ -43,11 +53,14 @@ def create_programmer(named_user):
                             location=named_user.location,
                             email=named_user.email,
                             twitter_handle=named_user.twitter_username)
-    # add check of login to see if in the db
-
-    db.session.add(programmer)
-    db.session.commit()
-
+    # check via login to see if programmer already in the db
+    
+    coder_login = Programmer.query.filter_by(login=named_user.login).first()
+    
+    if coder_login is None:
+        db.session.add(programmer)
+        db.session.commit()
+        
     return programmer
 
 
@@ -60,6 +73,17 @@ def create_programmers(named_users):
         output_list.append(coder)
 
     return output_list
+
+def update_programer_gender(named_user, gender):
+    """takes in named user and adds gender field to programmer."""
+    print("*****************************")
+    print("made it to update programer gender")
+    print(named_user, gender)
+    
+    named_user.gender = gender
+    db.session.add(named_user)
+    db.session.commit() 
+    
 
 def return_all_programmers():
     """Return all programmers."""
@@ -102,9 +126,6 @@ def create_genders(gen_response):
     return output_list
 
 
-
-
-
 def get_gender(first_name):
     """Return assumed geneder, frequency of name, and probability."""
 
@@ -127,11 +148,49 @@ def create_recruiter_querie(language_name, location, min_years_of_experience, ma
                                     location=location, 
                                     min_years_of_experience=min_years_of_experience,
                                     max_years_of_experience=max_years_of_experience) 
-    
+    db.session.add(recruiter_query)
+    db.session.commit()
+
     return recruiter_query
 #working
 
+def does_querie_exist(location, min_years_of_experience, max_years_of_experience): 
+    "find if there is an existing query"
 
+    return RecruiterQuery.query.filter(RecruiterQuery.location.like(f'{location}%'), 
+    RecruiterQuery.min_years_of_experience<=min_years_of_experience,
+    RecruiterQuery.max_years_of_experience>=max_years_of_experience).first() is not None
+
+
+def return_results_from_db(location, min_years_of_experience, max_years_of_experience):
+    "find querie results from the database"
+    
+    now = datetime.datetime.now()
+    min_years_of_experience = now - relativedelta(years=min_years_of_experience)
+    print(min_years_of_experience)
+    max_years_of_experience = now - relativedelta(years=max_years_of_experience)
+    print(max_years_of_experience)
+    return Programmer.query.filter(Programmer.gender==GenderEnum.female.value,
+                            Programmer.location.like(f'{location}%'), 
+                            and_(Programmer.profile_created_at<= min_years_of_experience,
+                            Programmer.profile_created_at>= max_years_of_experience))
+#Create a read query takes in location, experience to see if the query exists.
+# Return True if it exists
+# Return False if it does not
+#2022-06-08 03:19:55.953109
+#2017-06-08 03:19:55.953109
+def create_fav(user_id, programmer_id):
+    """Create fav programmer."""
+
+    fav = Favorite(user_id=user_id, programmer_id=programmer_id)
+    db.session.add(fav)
+    db.session.commit()
+
+    return fav
+
+def get_first_user(): 
+
+    return User.query.first()
 
 if __name__ == "__main__":
     from flask import Flask

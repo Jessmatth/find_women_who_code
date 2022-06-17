@@ -14,9 +14,9 @@ os.system("createdb fwwcdb")
 model.connect_to_db(app)
 model.db.create_all()
 
-crud.create_programmers(queries.list_of_named_users)
+#crud.create_programmers(queries.list_of_named_users)
 
 
-crud.create_genders(queries.gen_response)
+#crud.create_genders(queries.gen_response)
 
 
