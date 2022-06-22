@@ -192,6 +192,13 @@ def get_first_user():
 
     return User.query.first()
 
+def get_fav(programmer_id):
+    """Get favorited programmer from the database."""
+
+    fav_coder = Programmer.query.filter_by(programmer_id = programmer_id).all()
+
+    return fav_coder
+
 if __name__ == "__main__":
     from flask import Flask
     app = Flask(__name__)

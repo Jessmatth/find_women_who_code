@@ -3,12 +3,54 @@
 {% block title %}your_favorite_programmers{% endblock %}
 
 {% block content %}
+<div class="container">
+    <div class="row">
+      <div class="col d-flex justify-content-center">
+        <a href="/" class="lead backlink">
+          Go back to the search form
+        </a>
+      </div>
+    </div>
 
+    <div class="row">
+      <div class="col">
 
+        <div id="programmer-search-results">
+          <h2>Your Favorite Programmers</h2>
 
+          <ul class="programmer-list">
+          {% if data %}
+            {% for named_user in data %}
+              <li>
+                 Name: {{ named_user.full_name }}
+              </li>
+              <li>
+                Company: {{ named_user.company_name }}
+            </li>
+            <li>
+               Location: {{ named_user.location }}
+            </li>
+            <li>
+                Date of profile creation: {{ named_user.profile_created_at }}
+            </li>
+            <li>
+                Email: {{ named_user.email }}
+            </li>
+            <li>
+                Github Profile: https://github.com/{{ named_user.login }}
+              </li>
+            <li>
+                Twitter handle: {{ named_user.twitter_handle }}
+            </li>
 
-
-
-
-
+            </br>
+            {% endfor %}
+          {% else %}
+            <p> No favorites yet</p>
+          {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

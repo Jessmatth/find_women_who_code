@@ -14,7 +14,7 @@ app.jinja_env.auto_reload = True
 
 
 app = Flask(__name__)
-
+app.secret_key = 'RANDOM SECRET KEY'
 
 
 
@@ -84,9 +84,23 @@ def add_favorite_programmers(programmer_id):
     """Show favorite programmer profiles."""
     #to do: save user_id in session
     user = crud.get_first_user()
-    crud.create_fav(user.user_id, programmer_id)
+    
+    
+    crud.create_fav(user, programmer_id)
+    session["user"] = user
+    display_fav = crud.get_fav(programmer_id)
+    print("This is the user profile print statement   ", user)
+    print("This is the fav print statement    ", display_fav)
+    return render_template('favorite_programmers.html', data=display_fav)
 
-    return 'success', 200
+@app.route('/favorite_programmers', methods=['GET'])
+def view_favorite_programmers():
+    """Supports navigation from home to favorite_programmers."""
+    
+    user = session["user"]
+
+    return render_template('favorite_programmers.html', user=user)
+
 
 if __name__ == '__main__':
     connect_to_db(app)
