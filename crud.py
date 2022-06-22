@@ -192,12 +192,19 @@ def get_first_user():
 
     return User.query.first()
 
-def get_fav(programmer_id):
-    """Get favorited programmer from the database."""
+def get_fav(user_id):
+    """Get favorited programmer objects from the database, given a user id."""
 
-    fav_coder = Programmer.query.filter_by(programmer_id = programmer_id).all()
+    #lst_of_fav = Favorite.query.filter_by(user_id = user_id).all()
+    #join programmers on favorite and return programmer models .query.joinby
+    
 
-    return fav_coder
+    return db.session.query(Programmer).join(Favorite, Favorite.programmer_id == Programmer.programmer_id).filter(Favorite.user_id == user_id)
+
+def get_user_by_user_id(user_id):
+    """Get user by user id."""
+
+    return User.query.get(user_id)
 
 if __name__ == "__main__":
     from flask import Flask

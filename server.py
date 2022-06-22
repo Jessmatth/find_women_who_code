@@ -86,8 +86,8 @@ def add_favorite_programmers(programmer_id):
     user = crud.get_first_user()
     
     
-    crud.create_fav(user, programmer_id)
-    session["user"] = user
+    crud.create_fav(user.user_id, programmer_id)
+    session["user_id"] = user.user_id
     display_fav = crud.get_fav(programmer_id)
     print("This is the user profile print statement   ", user)
     print("This is the fav print statement    ", display_fav)
@@ -97,9 +97,11 @@ def add_favorite_programmers(programmer_id):
 def view_favorite_programmers():
     """Supports navigation from home to favorite_programmers."""
     
-    user = session["user"]
+    user_id = session["user_id"]
+    user = crud.get_user_by_user_id(user_id)
+    display_fav = crud.get_fav(user_id)
 
-    return render_template('favorite_programmers.html', user=user)
+    return render_template('favorite_programmers.html', user=user, data=display_fav)
 
 
 if __name__ == '__main__':
