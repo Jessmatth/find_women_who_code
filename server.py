@@ -29,9 +29,12 @@ def get_user_inputs():
     """Collect search criteria and show results. """
 
     location = request.form.get('location', '')
+    language = request.form.get('language', '')
     min_years_of_experience = int(request.form.get('min_experience', '0'))
     max_years_of_experience = int(request.form.get('max_experience', '14'))
+    
     print("*******************************************************" +location)
+    print("language:   ", language)
     print(min_years_of_experience)
     print("++++++++++++++++++++++++++++++++++++++++++++++++++++" ,max_years_of_experience)
     #Call the crud function for recruiter query.  If it exists, query db. 
@@ -42,16 +45,16 @@ def get_user_inputs():
     #Check if I have programmers in the database and then check the gender table if to find female matches. 
     #If not, call the queries that call functions
     #if location in postgresql:///fwwcdb:
-    does_exist = crud.does_querie_exist(location, min_years_of_experience,max_years_of_experience)
+    does_exist = crud.does_querie_exist(location, language, min_years_of_experience,max_years_of_experience)
     print(does_exist)
     if does_exist:
-        output_programmers = crud.return_results_from_db(location, min_years_of_experience,max_years_of_experience)
+        output_programmers = crud.return_results_from_db(location,language, min_years_of_experience,max_years_of_experience)
      
     else:
-        crud.create_recruiter_querie(None, location, min_years_of_experience, max_years_of_experience)
-        output_programmers = queries.call_functions(location, min_years_of_experience, max_years_of_experience)
+        crud.create_recruiter_querie(language, location, min_years_of_experience, max_years_of_experience)
+        output_programmers = queries.call_functions(location, language, min_years_of_experience, max_years_of_experience)
         
-    return render_template('search_results.html', data=output_programmers)
+    return render_template('search_results.html', data=output_programmers, location=location, language=language, min_years_of_experience=min_years_of_experience, max_years_of_experience=max_years_of_experience)
 
 @app.route('/add_your_data', methods=['GET'])
 def enter_add_your_data():
@@ -87,9 +90,9 @@ def add_favorite_programmers(programmer_id):
     
     
     crud.create_fav(user.user_id, programmer_id)
-    session["user_id"] = user.user_id
+    session["user"] = user.user_id
     display_fav = crud.get_fav(programmer_id)
-    print("This is the user profile print statement   ", user)
+    print("This is the user profile print statement   ", user.user_id)
     print("This is the fav print statement    ", display_fav)
     return render_template('favorite_programmers.html', data=display_fav)
 
@@ -97,9 +100,9 @@ def add_favorite_programmers(programmer_id):
 def view_favorite_programmers():
     """Supports navigation from home to favorite_programmers."""
     
-    user_id = session["user_id"]
-    user = crud.get_user_by_user_id(user_id)
-    display_fav = crud.get_fav(user_id)
+    user = crud.get_first_user()
+    
+    display_fav = crud.get_fav(user.user_id)
 
     return render_template('favorite_programmers.html', user=user, data=display_fav)
 

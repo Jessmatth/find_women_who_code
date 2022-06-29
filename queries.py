@@ -15,6 +15,7 @@ import time
 import crud
 import model
 import server
+import numpy
 
 
 from github import Github
@@ -46,22 +47,57 @@ def minimum_created_at_date(min_experience, max_experience):
 
         return (f"{max_query_date}..{min_query_date}")
 
+def create_github_created_at_date(years_experience):
+    """This function takes user input for number of years of experience and creates a github creation date."""
+    
+    now = datetime.datetime.now().isoformat()
+    now = now[:10]
+    year_digits = now[2:4]
+    
+    
+    if years_experience:
+        year_digits = int(year_digits)
+        output_github_date = year_digits - years_experience
+        output_github_date = now[0:2]+ str(output_github_date) + now[4:]
+        
+    return (f"{output_github_date}")
 
-
-def loop_to_collect_programmers(location): 
-    """Github API allows 5,000 responses per hour w/ 30 responses per request or 166 queries. 
+def loop_to_collect_programmers(location, language): 
+    """Github API allows 5,000 responses per hour w/ 100 responses per page or  queries. 
     This loop is designed to make these queries."""
-
+    
+    crud.create_language(language)
     page = 1
     headers = {'Authorization': f'token {os.environ["GITHUB_KEY"]}'}
-   
-    while page < 5:
-    #req = requests.get('https://api.github.com/search/users', params=payload, headers=headers) since=100000000&per_page=100
-        req = requests.get(f'https://api.github.com/search/users?q=location:{location}&page={page}&per_page=100', headers=headers)
-        read_resp = req.json()
-        page += 1
+    output = []
+    
+    req = requests.get(f'https://api.github.com/search/users?q=location:{location}+language:{language}&page={page}&per_page=100', headers=headers)
+    read_resp = req.json()
+    
+    total_count = read_resp["total_count"]
 
-    return read_resp
+    if total_count == 0: 
+        return output
+    else: 
+        total_pages = numpy.ceil(total_count/100)
+        if 'items' not in read_resp: 
+                print(read_resp['message'])
+                return output
+        output.append(read_resp)
+        
+
+        while len(output) < total_pages:
+        #req = requests.get('https://api.github.com/search/users', params=payload, headers=headers) since=100000000&per_page=100
+            page += 1
+            req = requests.get(f'https://api.github.com/search/users?q=location:{location}&page={page}&per_page=100', headers=headers)       
+            read_resp = req.json()
+            if 'items' not in read_resp: 
+                break
+            output.append(read_resp)
+            
+        
+
+    return output
 
 
 
@@ -86,8 +122,9 @@ def get_logins_from_API_response(passing_programmer_objects):
     """Loops through the response text to generate a list of logins that match the search criteria."""
 
     login_list =[]
-    for item in passing_programmer_objects['items']:
-        login_list.append(item['login'])
+    for page in passing_programmer_objects:
+        for item in page['items']:
+            login_list.append(item['login'])
       
     
     return login_list
@@ -102,17 +139,17 @@ def using_querie_functions(login_vist_var, min_years_of_experience, max_years_of
         user_profile = g.get_user(login)
         programmers.append(user_profile)
 
-    crud.create_programmers(programmers)
+    programmer_objects = crud.create_programmers(programmers)
     
     now = datetime.datetime.now().isoformat()
     now = now[:10]
     year_digits = now[2:4]
     num_year_digits = int(year_digits)
-    print("min years of experience", min_years_of_experience)
-    print("max years of experience", max_years_of_experience)
+    print("This is the programmer_objects", programmer_objects)
 
-    for named_user in programmers: 
-        experience = named_user.created_at
+    for programmer_object in programmer_objects: 
+        print("this is the programmer_object", programmer_object)
+        experience = programmer_object.profile_created_at
         experience = experience.strftime("%Y")
         experience = experience[2:4]
         num_experience = int(experience)
@@ -123,18 +160,17 @@ def using_querie_functions(login_vist_var, min_years_of_experience, max_years_of
         if min_years_of_experience <= num_experience <= max_years_of_experience: 
             print(num_experience)
             print(type(num_experience))
-            output.append(named_user)
+            output.append(programmer_object)
     print("filered by experience:", output)
     return output
 
+def get_user_profile(git_hub_login):
+    """Takes in git_hub login and returns git_hub programmer object."""
+    print(git_hub_login)
+    user_profile = g.get_user(git_hub_login)
 
-#db.session.add(list_of_named_users)     # 
-#db.session.commit() 
+    return user_profile
 
-#list_of_named_users is a list of programmer objects
-#req = requests.get('https://api.github.com/search/users', params=payload) 
-
-#response = req.json()
 
 def get_first_name(login_vist_var): 
     full_names = []
@@ -211,29 +247,31 @@ def find_women(gen_response):
 
 
 
-def search_response(women_names, list_of_named_users):
+def search_response(women_names, list_of_programmer_objects, language):
     """initialize a new list and append with users."""
     print("women's names:", women_names)
 
 
     output= []
-    for named_user in list_of_named_users: 
-        print(named_user.name)
-        if named_user.name and named_user.name.split(" ", 1)[0] in women_names: 
-            output.append(named_user)
-    
+    for programmer_object in list_of_programmer_objects: 
+        print(programmer_object.full_name)
+        if programmer_object.full_name and programmer_object.full_name.split(" ", 1)[0] in women_names: 
+            output.append(programmer_object)
+            crud.update_programer_gender(programmer_object, model.GenderEnum.female.value)    
+            crud.create_programmer_language(programmer_object, language)
+
     return output
 
-def call_functions(location, min_years_of_experience, max_years_of_experience):
+def call_functions(location, language, min_years_of_experience, max_years_of_experience):
     """Calls all functions in queries"""
     #programmer_experience = minimum_created_at_date(min_years_of_experience, max_years_of_experience)
-    passing_programmer_objects = loop_to_collect_programmers(location)
+    passing_programmer_objects = loop_to_collect_programmers(location, language)
     login_vist_var = get_logins_from_API_response(passing_programmer_objects)
-    list_of_named_users = using_querie_functions(login_vist_var, min_years_of_experience, max_years_of_experience)
+    list_of_programmer_objects = using_querie_functions(login_vist_var, min_years_of_experience, max_years_of_experience)
     list_of_first_names = get_first_name(login_vist_var)
     gen_response = get_gender(list_of_first_names)
     women_names = find_women(gen_response)
-    output_programmers = search_response(women_names, list_of_named_users)
+    output_programmers = search_response(women_names, list_of_programmer_objects, language)
     #output = optional_print(output_programmers)
     #print(output)
 
@@ -248,6 +286,7 @@ def call_functions(location, min_years_of_experience, max_years_of_experience):
     
 #     return list_of_output_str
 
+#Create a function to add programmer_id to gender table for programmers in DB.
 
 
 

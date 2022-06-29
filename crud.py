@@ -22,14 +22,25 @@ from dateutil.relativedelta import relativedelta
 #                                 programming_languages_id=programming_languages_id)
  
 #     return recruiter_query_languages
+def create_language(language): 
+    """Insert language into languages table."""
+    languages_in_db = Languages.query.filter_by(language_name=language).first()
+    
+    if languages_in_db is None:
+        language_object = Languages(language_name=language)
+        db.session.add(language_object)
+        db.session.commit()
+
+    return Languages.query.filter_by(language_name=language).first()
 
 
-def create_programmer_languages(programmer, languages): 
+def create_programmer_language(programmer, language): 
     """Connect multiple languages to multiple programmers."""
 
-    programmer_languages = []
-    for language in languages:
-        programmer_languages.append(ProgrammerLanguages(programmer=programmer,language=language))
+    language_object = Languages.query.filter_by(language_name=language).first()
+    programmer_languages = ProgrammerLanguages(programmer_id=programmer.programmer_id,languages_id=language_object.language_id)
+    db.session.add(programmer_languages)
+    db.session.commit()
 
     return programmer_languages
    
@@ -134,7 +145,7 @@ def get_gender(first_name):
 
 def create_languages(language_name):
     """Insert new programming languages."""
-
+    
     language = Languages(language_name=language_name)
 
     return language
@@ -154,15 +165,18 @@ def create_recruiter_querie(language_name, location, min_years_of_experience, ma
     return recruiter_query
 #working
 
-def does_querie_exist(location, min_years_of_experience, max_years_of_experience): 
+def does_querie_exist(location, language, min_years_of_experience, max_years_of_experience): 
     "find if there is an existing query"
+    db_querie = RecruiterQuery.query.filter(RecruiterQuery.location.like(f'{location}%'),(RecruiterQuery.min_years_of_experience<=min_years_of_experience),(RecruiterQuery.max_years_of_experience>=max_years_of_experience))
+    
+    if language != '': 
+        db_querie = db_querie.filter(RecruiterQuery.language_name == language)
+    
 
-    return RecruiterQuery.query.filter(RecruiterQuery.location.like(f'{location}%'), 
-    RecruiterQuery.min_years_of_experience<=min_years_of_experience,
-    RecruiterQuery.max_years_of_experience>=max_years_of_experience).first() is not None
+    return db_querie.first() is not None
+    
 
-
-def return_results_from_db(location, min_years_of_experience, max_years_of_experience):
+def return_results_from_db(location, language, min_years_of_experience, max_years_of_experience):
     "find querie results from the database"
     
     now = datetime.datetime.now()
@@ -170,10 +184,22 @@ def return_results_from_db(location, min_years_of_experience, max_years_of_exper
     print(min_years_of_experience)
     max_years_of_experience = now - relativedelta(years=max_years_of_experience)
     print(max_years_of_experience)
-    return Programmer.query.filter(Programmer.gender==GenderEnum.female.value,
+
+    db_querie = Programmer.query.filter(Programmer.gender==GenderEnum.female.value,
                             Programmer.location.like(f'{location}%'), 
                             and_(Programmer.profile_created_at<= min_years_of_experience,
                             Programmer.profile_created_at>= max_years_of_experience))
+    breakpoint()
+    if language != '': 
+        db_querie = db_querie.filter(RecruiterQuery.language_name == language)
+
+    return db_querie
+# select * from programmers p
+# left joins programmer_languages pl on p.programmer_id = pl.programmer_id
+# left joins languages l on l.language_id = pl.language_id
+# where l.language_name = 'Go';
+
+
 #Create a read query takes in location, experience to see if the query exists.
 # Return True if it exists
 # Return False if it does not

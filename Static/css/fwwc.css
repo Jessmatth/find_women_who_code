@@ -1,48 +1,91 @@
 
-  video {
+  /* video {
     /** Simulationg background-size: cover */
-    object-fit: cover;
+    /* object-fit: cover;
     height: 100%;
     width: 100%;
   
     position: absolute;
     top: 0;
     left: 0;
+  /* } */ 
+
+     /* initial state */
+ .message {
+  display: none;
   }
 
-  .video-wrapper {
+  /* submitted state */
+ .sample-form.submitted .message {
+  display: block;
+  padding: 25px 30px;
+  background: transparent;
+  font: 300 18px/27px 'Open Sans', Helvetica, Arial, sans-serif;
+  text-align: center;
+  }
+
+  #background-video {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1000;
+  }
+
+
+  /* .video-wrapper {
     border: 2px solid #000;
     width: 1500px;
-    height: 1000px;
-    position: relative;
+    height: 900px;
+    object-fit: cover;
+    position: fixed;
     overflow: hidden;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+  } */
+
+  @media (max-width: 750px) {
+    #background-video { display: none; }
+    body {
+      background: url("https://res.cloudinary.com/drbl3in3w/video/upload/v1656037131/iStock-1178752236_ves0zr.mp4") no-repeat;
+      background-size: cover;
+    }
+}
+
+#row {
+  color: white;
+}
+
+#column {
+  color: white;
+}
 
 .header {
     height: 0px;
     padding-top: 0.8em;
     text-align: center;
     font-size: 3em;
-    justify-content: left;
+    justify-content: center;
     align-items: center;
     margin-bottom: 0.67em;
+    color: white;
   }
 
 .title {
     font-size: 3em;
-    justify-content: left;
+    justify-content: center;
     align-items: center;
-    color: black
+    color: white !important;
   }
   
 .base {
     justify-content: left;
     align-items: center;
-    color: black
+    color: #faf4f4 !important; 
+    z-index: 20;
 }
 
 
@@ -55,6 +98,7 @@
     overflow-y: scroll;
     font-size: 11px;
     resize: vertical;
+    color: white;
   }
   
   h1,
@@ -66,7 +110,7 @@
   th {
     font-family: 'Helvetica', sans-serif;
     font-weight: normal;
-    color: black
+    color: rgb(247, 242, 242)
   }
   
   .backlink::before {
@@ -77,6 +121,7 @@
     padding-left: 0;
     padding-right: 0;
     align-items: center;
+    color: white;
   }
   
   .row > .above {
@@ -87,6 +132,14 @@
   
   .container {
     align-items: center;
+    position: fixed;
+    bottom: 0;
+    background: rgba(5, 5, 5, 0.5);
+    color: #f1f1f1 !important;
+    width: 100%;
+    padding: 20px;
+    z-index: 20;
+    
   }
 
   .form-input {

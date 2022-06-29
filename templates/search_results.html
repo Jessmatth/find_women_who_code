@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block title %}Programmer Results{% endblock %}
-
+{% block header %}
+<script src="../static/js/fav.js"> </script>
+{% endblock%}
 {% block content %}
   <div class="container">
     <div class="row">
@@ -9,8 +11,16 @@
         <a href="/" class="lead backlink">
           Go back to the search form
         </a>
+        <a href="/favorite_programmers">View your favorite programmers</a>
       </div>
     </div>
+
+    <div class="video-wrapper">
+      <video playsinline autoplay muted loop id="background-video">
+        <source src="https://res.cloudinary.com/drbl3in3w/video/upload/v1656043803/iStock-1303833741_vtcnky.mp4">
+      </video>
+    
+
 
     <div class="row">
       <div class="col">
@@ -24,6 +34,7 @@
               <li>
                  Name: {{ named_user.full_name }}
               </li>
+              <button id="{{named_user.programmer_id}}" class="favorite_button">favorite</button>
               <li>
                 Company: {{ named_user.company_name }}
             </li>
@@ -37,8 +48,12 @@
                 Email: {{ named_user.email }}
             </li>
             <li>
+                Github Profile: https://github.com/{{ named_user.login }}
+              </li>
+            <li>
                 Twitter handle: {{ named_user.twitter_handle }}
             </li>
+
             </br>
             {% endfor %}
           {% else %}
