@@ -31,6 +31,7 @@ class Favorite(db.Model):
                         primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
     programmer_id = db.Column(db.Integer, db.ForeignKey("programmers.programmer_id"))
+    
 
     def __repr__(self):
         return f'<Favorite={self.fav_id} {self.user_id} {self.programmer_id}>'

@@ -16,7 +16,11 @@ app.jinja_env.auto_reload = True
 app = Flask(__name__)
 app.secret_key = 'RANDOM SECRET KEY'
 
+@app.route('/home')
+def welcome():
+    """Display welcome page."""
 
+    return render_template('welcome.html')
 
 @app.route('/')
 def home():
