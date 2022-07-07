@@ -165,6 +165,12 @@ def create_recruiter_querie(language_name, location, min_years_of_experience, ma
     return recruiter_query
 #working
 
+# def get_language_id(language):
+#     """Get language id from language table"""
+#     current_language = Languages.query.filter(Languages.language_name == language)
+
+#     return Languages.language_id(current_language)
+
 def does_querie_exist(location, language, min_years_of_experience, max_years_of_experience): 
     "find if there is an existing query"
     db_querie = RecruiterQuery.query.filter(RecruiterQuery.location.like(f'{location}%'),(RecruiterQuery.min_years_of_experience<=min_years_of_experience),(RecruiterQuery.max_years_of_experience>=max_years_of_experience))
@@ -189,11 +195,96 @@ def return_results_from_db(location, language, min_years_of_experience, max_year
                             Programmer.location.like(f'{location}%'), 
                             and_(Programmer.profile_created_at<= min_years_of_experience,
                             Programmer.profile_created_at>= max_years_of_experience))
-    breakpoint()
-    if language != '': 
-        db_querie = db_querie.filter(RecruiterQuery.language_name == language)
 
+    if language != '':
+        programmers_matching_language = db.session.query(Programmer).join(ProgrammerLanguages).join(Languages).filter(Languages.language_name == language).all()
+        output = []
+        for programmer in programmers_matching_language:
+            if programmer in db_querie:
+                output.append(programmer)
+                return set(output)
+                            
+                          
     return db_querie
+  
+
+#   session.query(
+#     User
+# ).join(
+#     Document
+# ).join(
+#     DocumentsPermissions
+# ).filter(
+#     User.email == "user@email.com"
+# ).all()
+
+# (Programmer, ProgrammerLanguages, Languages
+#                             ).filter(Programmer.programmer_id == ProgrammerLanguages.programmer_id
+#                             ).filter(ProgrammerLanguages.languages_id == Languages.language_id
+#                             ).filter(Languages.language_name == language).group_by(Programmer.programmer_id).subquery()
+# session.query(
+#     User, 
+#     Document, 
+#     DocumentsPermissions
+# ).filter(
+#     User.email == Document.author
+# ).filter(
+#     Document.name == DocumentsPermissions.document
+# ).filter(
+#     User.email == "user@email.com"
+# ).all()
+
+# SELECT 'all the columns'
+# FROM user
+# JOIN document ON document.author_id = user.id AND document.author == User.email
+# JOIN document_permissions ON document_permissions.document_id = document.id AND document_permissions.document = document.name
+
+# session.query(
+#     User
+# ).join(
+#     Document
+# ).join(
+#     DocumentsPermissions
+# ).filter(
+#     User.email == "user@email.com"
+# ).all()
+
+# x = db.session.query(
+#     Programmer
+# ).join(ProgrammerLanguages
+# ).join(Languages
+# ).filter(Languages.language_name == "language"
+# ).all()
+
+
+
+    #  humans = set()
+    # for animal in (
+    #     Animal.query.options(db.joinedload("human"))
+    #     .filter_by(animal_species=animal_species)
+    #     .all()
+    # ):
+    #     humans.add(animal.human)
+
+    # return list(humans)
+
+# billing_address = relationship("Address", foreign_keys="Customer.billing_address_id")
+# Programmer.programmer_id = Programmer.query(Languages.language_name == language) & (ProgrammerLanguages.languages_id == Languages.language_id)
+
+# emps = db.session.query(Employee,
+#                         Department).join(Department).all()
+# emps = db.session.query(Employee.name,
+#                         Department.dept_name,
+#                         Department.phone).join(Department).all()
+
+# rows = session
+#     .query(Entity1, Entity2)
+#     .join(Entity2, (Entity1.col1==Entity2.col1) & (Entity1.col2==Entity2.col2))
+#     .all()
+
+# for name, dept_name, phone in emps:      # [(n, d, p), (n, d, p)]
+#     print(name, dept_name, phone)
+
 # select * from programmers p
 # left joins programmer_languages pl on p.programmer_id = pl.programmer_id
 # left joins languages l on l.language_id = pl.language_id
