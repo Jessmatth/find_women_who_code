@@ -1,17 +1,45 @@
 
 {% extends 'base.html' %}
 
-{% block title %}find_women_who_code(){% endblock %}
+{% block title %}{% endblock %}
 {% block header %}
 <script src="../static/js/searching_alert.js"> </script>
 {% endblock%}
 {% block content %}
+<link rel="stylesheet" href="/static/css/fwwc.css">
+<nav class="navbar fixed-top">
+  <div class="base">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+      <a class="navbar-brand" href="/">
+        <div class="fa-3x">
+        <i class="fa-solid fa-cog fa-spin" style="--fa-animation-duration: 15s;"></i>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" a href="/">Home <span class="sr-only"></span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/add_your_data">Add your data</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/favorite_programmers">View favorite programmers</a>
+          </li>
+      </div>
+    </nav>
+  </div> 
+</nav>
+</div> 
 
   <div class="video-wrapper">
     <video playsinline autoplay muted loop id="background-video">
       <source src="https://res.cloudinary.com/drbl3in3w/video/upload/v1656037131/iStock-1178752236_ves0zr.mp4">
     </video>
-  
+  </div>
     <div class="container">
 
         <div class="row">
@@ -21,23 +49,20 @@
         </div>
           
     
-          <a href="/add_your_data">Add your data</a>
-          <br> <br />
-          <a href="/favorite_programmers">View your favorite programmers</a>
-          <br> <br />
+          <!-- <a href="/add_your_data">Add your data</a> -->
+          
+          <!-- <a href="/favorite_programmers">View your favorite programmers</a> -->
+          
         <form id="user_input" action="/search/userinput" method="POST">
-      <!-- <form method="GET" action="/search"> -->
+      
           <div class="form-input">
             <!-- <form> -->
             <label for="location">Enter a location: </label>
-            <input type="text" name="location" id="location" required>
-            <br> <br />
+              <input type="text" name="location" id="location" required>
+              <br> <br />
             <label for="language">Enter a programming language:</label>
-            <input type="text" name="language" id="language"
-            <br> <br />
-            </div>
-            <br />
-  
+              <input type="text" name="language" id="language" <br> 
+              <br> <br> 
             <label for="min_experience">Minimum Years of experience:</label>
             <select id="min_experience" name="min_experience">
               <option value="0">Zero</option>
@@ -80,8 +105,9 @@
             <!-- <form id="pass-form" onsubmit="window.location.href = "/search/userinput", type="submit" value="Submit" > -->
           <input type="submit" id = "submitt_button" value="Submit" />
         </form>
-
+      </div>
     </div>
+  
 
 <!-- Create loader(make it invisibile until they click submit) or gif in js when submit is clicked, when there is a response -->
 

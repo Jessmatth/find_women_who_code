@@ -2,6 +2,45 @@
 
 {% block title %}Please Enter Your Information{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="/static/css/fwwc.css">
+<div class="video-wrapper">
+  <video playsinline autoplay muted loop id="background-video-input">
+    <source src="https://res.cloudinary.com/drbl3in3w/video/upload/v1656043803/iStock-1303833741_vtcnky.mp4">
+  </video>
+
+<nav class="navbar fixed-top">
+  <div class="base">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+      <a class="navbar-brand" href="/">
+        <div class="fa-3x">
+        <i class="fa-solid fa-cog fa-spin" style="--fa-animation-duration: 15s;"></i>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" a href="/">Home <span class="sr-only"></span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/add_your_data">Add your data</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/favorite_programmers">View favorite programmers</a>
+          </li>
+      </div>
+    </nav>
+  </div> 
+</nav>
+</div> 
+<div class="display-results">
+
+      <div id="add_your_data">
+      <h2>Please Enter Your Information</h2>
+      </div>
+      
   <form id="add_your_data" action="/add_your_data" method="POST">
     <!-- <form method="GET" action="/search"> -->
         <div class="form-input">
@@ -10,6 +49,7 @@
           <input type="text" name="name" id="name" required> -->
           <label for="git_hub_login">github login: </label>
           <input type="text" name="git_hub_login" id="form" required>
+          <br> </br>
           <label for="gender">Gender expression</label>
             <select id="gender" name="gender">
             <option value="female">female</option>
@@ -45,11 +85,12 @@
         <input type="text" name="twitter_handle" id="twitter_handle">   -->
   <div id="message" class="message">
     <p>Adding to the database...</p>
-</div>
+  </div>
   <label> --></label>
   <!-- <form id="pass-form" onsubmit="window.location.href = "/search/userinput", type="submit" value="Submit" > -->
-<input type="submit" id = "submitt_button" value="Submit" />
-</form>
+    <input type="submit" id="submitt_button" value="Submit" />
+  </form>
+</div>
 
 
 

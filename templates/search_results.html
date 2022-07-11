@@ -5,33 +5,94 @@
 <script src="../static/js/fav.js"> </script>
 {% endblock%}
 {% block content %}
-  <div class="container">
+<link rel="stylesheet" href="/static/css/fwwc.css">
+<nav class="navbar fixed-top">
+  <div class="base">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+      <a class="navbar-brand" href="/">
+        <div class="fa-3x">
+        <i class="fa-solid fa-cog fa-spin" style="--fa-animation-duration: 15s;"></i>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" a href="/">Home <span class="sr-only"></span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/add_your_data">Add your data</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/favorite_programmers">View favorite programmers</a>
+          </li>
+      </div>
+    </nav>
+  </div> 
+</nav>
+</div> 
+  <div class="container display-results">
     <div class="row">
-      <div class="col d-flex justify-content-center">
-        <a href="/" class="lead backlink">
+      <!-- <div class="col"> -->
+        <!-- <a href="/" class="lead backlink">
           Go back to the search form
         </a>
-        <a href="/favorite_programmers">View your favorite programmers</a>
-      </div>
+        <a href="/favorite_programmers">View your favorite programmers</a> -->
+      <!-- </div> -->
     </div>
 
-    <div class="video-wrapper">
-      <video playsinline autoplay muted loop id="background-video">
-        <source src="https://res.cloudinary.com/drbl3in3w/video/upload/v1656043803/iStock-1303833741_vtcnky.mp4">
-      </video>
-    
-
+    <!-- <div class="background-image">
+      <img img source="https://res.cloudinary.com/drbl3in3w/image/upload/v1656200588/two_women_at_computer_l8s52r.jpg"<img>
+    </div>   -->
+    <img src="https://res.cloudinary.com/drbl3in3w/image/upload/v1656200588/two_women_at_computer_l8s52r.jpg" id="bg" alt="">
 
     <div class="row">
       <div class="col">
+        <ul class="programmer-list">
+          <div id="programmer-search-results">
+          <h2>
+            Displaying results for programmers in {{ location }} with experience in {{ language }}</h2>
+          <h2>
+            and {{ min_years_of_experience }}-{{ max_years_of_experience }} years of experience</h2>
 
-        <div id="programmer-search-results">
-          <h2>Programmer Search Results</h2>
-
-          <ul class="programmer-list">
-          {% if data %}
+            {% if data %}
             {% for named_user in data %}
-              <li>
+
+              <div class="card container-fluid" style="width: 50rem;">
+
+                <div class="col-md-10"></div>
+                <div class="card-body">
+                  <h5 class="card-title"> <span style=color:black>{{ named_user.full_name }}</span></h5>
+                  <div class="row">  
+                    <div class="col-md-2 float-right">
+                      <button class="btn btn-primary" id="{{named_user.programmer_id}}" class="favorite_button">favorite</button>
+                      </div>
+                  </div>
+                      
+                  
+                  <h6 class="card-subtitle mb-2 text-muted">{{ named_user.company_name if named_user.company_name is not none }}</h6>
+                  <p class="card-text">
+                  <div class="card" style="width: 45rem;">
+                    <ul class="list-group list-group-flush">
+                      
+                      <li class="list-group-item">Location: {{ named_user.location }}</li>
+
+                      <li class="list-group-item">Date of profile creation: {{ named_user.profile_created_at }}</li>
+                      
+                      <li class="list-group-item">Email: {{ named_user.email }}</li>
+                    </ul>
+                  
+                  </div>
+                  <a target="_blank" href="https://github.com/{{ named_user.login }}" class="card-link">https://github.com/{{ named_user.login }}</a> 
+                  <a target="_blank" href="https://twitter.com/{{ named_user.twitter_handle }}" class="card-link">https://twitter.com/{{ named_user.twitter_handle }}</a>
+                </div>
+              </div>
+
+
+          
+              <!-- <li>
                  Name: {{ named_user.full_name }}
               </li>
               <button id="{{named_user.programmer_id}}" class="favorite_button">favorite</button>
@@ -48,19 +109,21 @@
                 Email: {{ named_user.email }}
             </li>
             <li>
-                Github Profile: https://github.com/{{ named_user.login }}
+                Github Profile: <span style=color:black><a target="_blank" href="https://github.com/{{ named_user.login }}">https://github.com/{{ named_user.login }}</a></span>
               </li>
             <li>
-                Twitter handle: {{ named_user.twitter_handle }}
+                Twitter handle: <span style=color:black><a target="_blank" href="https://twitter.com/{{ named_user.twitter_handle }}">https://twitter.com/{{ named_user.twitter_handle }}</a></span>
             </li>
 
-            </br>
-            {% endfor %}
-          {% else %}
-            <p> No Results Found</p>
-          {% endif %}
-          </ul>
-        </div>
+            </br> --> 
+              {% endfor %}
+            {% else %}
+              <p> No Results Found</p>
+            {% endif %}
+            </div>
+          </div>
+        
+        </ul>
       </div>
     </div>
   </div>

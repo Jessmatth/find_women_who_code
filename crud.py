@@ -202,7 +202,7 @@ def return_results_from_db(location, language, min_years_of_experience, max_year
         for programmer in programmers_matching_language:
             if programmer in db_querie:
                 output.append(programmer)
-                return set(output)
+        return set(output)
                             
                           
     return db_querie

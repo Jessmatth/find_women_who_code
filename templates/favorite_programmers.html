@@ -1,49 +1,79 @@
 {% extends 'base.html' %}
 
-{% block title %}your_favorite_programmers{% endblock %}
+{% block title %}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-      <div class="col d-flex justify-content-center">
-        <a href="/" class="lead backlink">
-          Go back to the search form
-        </a>
+<link rel="stylesheet" href="/static/css/fwwc.css">
+<nav class="navbar fixed-top">
+  <div class="base">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+      <a class="navbar-brand" href="/">
+        <div class="fa-3x">
+        <i class="fa-solid fa-cog fa-spin" style="--fa-animation-duration: 15s;"></i>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" a href="/">Home <span class="sr-only"></span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/add_your_data">Add your data</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" a href="/favorite_programmers">View favorite programmers</a>
+          </li>
       </div>
-    </div>
-
+    </nav>
+  </div> 
+</nav>
+</div> 
+<div class="container display-results">
     <div class="row">
       <div class="col">
+        </a>
+      
+            <img src="https://res.cloudinary.com/drbl3in3w/image/upload/v1656202206/iStock-1390871422_msmcsp.jpg" id="bg" alt="">
+    
 
-        <div id="programmer-search-results">
-          <h2>Your Favorite Programmers</h2>
+        <div id="fav-programmer-search-results">
+          
 
           <ul class="programmer-list">
+            <h2>Your Favorite Programmers</h2>
           {% if data %}
             {% for named_user in data %}
-              <li>
-                 Name: {{ named_user.full_name }}
-              </li>
-              <li>
-                Company: {{ named_user.company_name }}
-            </li>
-            <li>
-               Location: {{ named_user.location }}
-            </li>
-            <li>
-                Date of profile creation: {{ named_user.profile_created_at }}
-            </li>
-            <li>
-                Email: {{ named_user.email }}
-            </li>
-            <li>
-                Github Profile: https://github.com/{{ named_user.login }}
-              </li>
-            <li>
-                Twitter handle: {{ named_user.twitter_handle }}
-            </li>
+            <div class="card container-fluid" style="width: 50rem;">
 
-            </br>
+              <div class="col-md-10"></div>
+              <div class="card-body">
+                <h5 class="card-title"> <span style=color:black>{{ named_user.full_name }}</span></h5>
+                <div class="row">  
+                  
+                </div>
+                    
+                    
+                <h6 class="card-subtitle mb-2 text-muted">{{ named_user.company_name if named_user.company_name is not none }}</h6>
+                <p class="card-text">
+                <div class="card" style="width: 45rem;">
+                  <ul class="list-group list-group-flush">
+                    
+                    <li class="list-group-item">Location: {{ named_user.location }}</li>
+
+                    <li class="list-group-item">Date of profile creation: {{ named_user.profile_created_at }}</li>
+                    
+                    <li class="list-group-item">Email: {{ named_user.email }}</li>
+                  </ul>
+                
+                </div>
+                <a target="_blank" href="https://github.com/{{ named_user.login }}" class="card-link">https://github.com/{{ named_user.login }}</a> 
+                <a target="_blank" href="https://twitter.com/{{ named_user.twitter_handle }}" class="card-link">https://twitter.com/{{ named_user.twitter_handle }}</a>
+              </div>
+            </div>
+
             {% endfor %}
           {% else %}
             <p> No favorites yet</p>
@@ -52,5 +82,5 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
 {% endblock %}
